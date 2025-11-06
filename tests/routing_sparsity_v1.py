@@ -232,7 +232,7 @@ def sparsity_analysis(
         train_step(model, optimizer, metrics, inputs, labels)
 
         if epoch > 0 and (epoch % eval_every == 0 or epoch == num_epochs - 1):
-            print(f"Epoch {epoch+1}/{num_epochs}")
+            # print(f"Epoch {epoch+1}/{num_epochs}")
 
             # for metric, value in metrics.compute().items():
             #     metrics_history[f"train_{metric}"].append(float(value))
@@ -246,7 +246,7 @@ def sparsity_analysis(
 
         # print(metrics_history)
 
-            print(f"Epoch {epoch+1}, Loss: {metrics_history['eval_loss'][-1]:.4f}, Accuracy: {metrics_history['eval_accuracy'][-1]*100:.2f}%")
+            # print(f"Epoch {epoch+1}, Loss: {metrics_history['eval_loss'][-1]:.4f}, Accuracy: {metrics_history['eval_accuracy'][-1]*100:.2f}%")
 
     # # append the performance and threshold to results_dict
     # results_dict['threshold'].append(float(threshold))
@@ -254,9 +254,9 @@ def sparsity_analysis(
     # results_dict['loss'].append(float(metrics_history['eval_loss'][-1]))
     # results_dict['resample'].append(int(resample))
 
+    print(f"Threshold: {threshold}, Final Loss: {metrics_history['eval_loss'][-1]:.4f}, Final Accuracy: {metrics_history['eval_accuracy'][-1]*100:.2f}%")
+
     return model, metrics_history
-
-
 
 
 
@@ -269,9 +269,10 @@ def __main__():
     key1 = jax.random.key(234)
     key1, key2 = jax.random.split(key1, 2)
     rngs = nnx.Rngs(params=key1, dropout=key2)
-    num_resamples = 30
+    num_resamples = 10
     results_dict = defaultdict(list)
-    test_input, test_labels = generate_random_inputs_and_labels(batch_size=10, in_features=100, label_size=10, rngs=rngs)
+    test_input, test_labels = generate_random_inputs_and_labels(batch_size=500, in_features=100, label_size=10, rngs=rngs)
+
     for r in tqdm(range(num_resamples), desc="Resample Progress"):
         for i_th, th in tqdm(enumerate(thresholds_arr), total=len(thresholds_arr), desc="Sparsity Analysis Progress"):
             print(f"Testing for threshold {th}")
@@ -294,7 +295,7 @@ def __main__():
     # print(results_dict)
 
     # save the results_dict
-    save_metrics(results_dict, filename=f"routing_sparsity_n{model.noise_sd:.02f}_r{num_resamples}_{today}.pkl", metrics_dir=DATA_PATH)
+    # save_metrics(results_dict, filename=f"routing_sparsity_n{model.noise_sd:.02f}_r{num_resamples}_{today}.pkl", metrics_dir=DATA_PATH)
 
 if __name__ == "__main__":
     __main__()
